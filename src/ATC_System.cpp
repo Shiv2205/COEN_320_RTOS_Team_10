@@ -1,7 +1,9 @@
 #include <iostream>
-using namespace std;
+#include <stdlib.h>
+#include <Parser.h>
 
-int main() {
-	cout << "Hello World!!!" << endl; // prints Hello World!!!
-	return 0;
+int main()
+{
+  Parser::Parse();
+  return 0;
 }
