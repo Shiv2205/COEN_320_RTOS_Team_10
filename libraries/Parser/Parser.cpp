@@ -54,15 +54,16 @@ using namespace Debug;
 
 
 /*Implementations*/
-void Parser::Parse(void)
+Aircraft_T::Tuple_Vector Parser::Parse(void)
 {
-  Parser::Parse(DATA_PATH);
+  return Parser::Parse(DATA_PATH);
 }
 
-void Parser::Parse(std::string file_path)
+Aircraft_T::Tuple_Vector Parser::Parse(std::string file_path)
 {
-  std::ifstream   reader;
-  std::string     line;
+  Aircraft_T::Tuple_Vector    aircraft_data;
+  std::ifstream               reader;
+  std::string                 line;
 
   reader.open(file_path, std::ifstream::in);
 
@@ -77,11 +78,21 @@ void Parser::Parse(std::string file_path)
 
   while(reader.good())
   {
-    getline(reader, line);
-    std::cout << line << std::endl;
+    std::string words[8];
+
+    getline(reader, line);//get line from file
+    Parser::Split(line, ',', &words[0]);//Split line into words
+
+    if(EMPTY_STR != words[0])//Check if there are words
+    {
+      //Turn the words into a tuple and Push the tuples into an array
+      aircraft_data.push_back(Parser::Line_to_tuple(&words[0]));
+    }
   }
 
   reader.close();
+
+  return aircraft_data;
 }
 
 void Parser::Handle_missing_file(const std::string& file_path, std::ifstream& reader)
@@ -93,9 +104,55 @@ void Parser::Handle_missing_file(const std::string& file_path, std::ifstream& re
 
   for(itr = 0; itr < TRAFFIC_DATA_SIZE; itr++)
   {
-    writer << traffic_data[itr] << "\n";
+    if((TRAFFIC_DATA_SIZE - 1) == (itr))
+    {
+      writer << traffic_data[itr];
+    }
+    else
+    {
+      writer << traffic_data[itr] << "\n";
+    }
   }
 
   writer.close();
   reader.open(file_path, std::ifstream::in);
+}
+
+void Parser::Split(std::string line, char delim, std::string* words)
+{
+  int         word_count  = 0;
+  std::size_t delim_pos   = line.find(delim);
+
+  while(std::string::npos != delim_pos)
+  {
+    *(words + word_count) = line.substr(0, delim_pos);
+
+    line = line.substr(delim_pos + 1);
+
+    delim_pos = line.find(delim);
+    word_count++;
+  }
+
+  if(std::string::npos == delim_pos)
+  {
+    *(words + word_count) = line.substr(0);
+  }
+}
+
+Aircraft_T::Tuple Parser::Line_to_tuple(std::string* words)
+{
+  return std::make_tuple(
+      /*Time of arrival*/ std::stoi(*(words + 0), nullptr, 10),
+      /*Aircraft ID*/     *(words + 1),
+      /*Displacement*/    Vectors(
+                                    std::stoi(*(words + 2), nullptr, 10),
+                                    std::stoi(*(words + 3), nullptr, 10),
+                                    std::stoi(*(words + 4), nullptr, 10)
+                                 ),
+      /*Velocity*/        Vectors(
+                                   std::stoi(*(words + 5), nullptr, 10),
+                                   std::stoi(*(words + 6), nullptr, 10),
+                                   std::stoi(*(words + 7), nullptr, 10)
+                                 )
+                        );
 }
