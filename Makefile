@@ -22,6 +22,7 @@ LD = $(CXX)
 #INCLUDES += -I../mylib/public
 # User-defined include flags (include all folders within "libraries")
 INCLUDES += $(addprefix -I, $(wildcard libraries/*))
+INCLUDES += -ITypes
 
 #LIBS += -L/path/to/my/lib/$(PLATFORM)/usr/lib -lmylib
 #LIBS += -L../mylib/$(OUTPUT_DIR) -lmylib
@@ -48,7 +49,7 @@ rwildcard = $(wildcard $(addprefix $1/*.,$2)) $(foreach d,$(wildcard $1/*),$(cal
 
 #Source list
 SRCS = $(call rwildcard, src, c cpp)
-SRCS += $(call rwildcard, libraries, c cpp)
+SRCS += $(call rwildcard, libraries/*, c cpp)
 
 #Object files list
 OBJS = $(addprefix $(OUTPUT_DIR)/,$(addsuffix .o, $(basename $(SRCS))))
