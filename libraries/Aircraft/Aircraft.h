@@ -29,33 +29,34 @@ private:
 
 public:
 
-  //Constructor
+  // Constructor
   Aircraft();
-  //Parametrized Constructor
+  // Parametrized Constructor
   Aircraft(int arrival_time, std::string aircraft_id, Vectors displacement, Vectors velocity);
-  //Tuple Constructor
+  // Tuple Constructor
   Aircraft(Aircraft_T::Tuple& aircraft_tuple);
 
-  //Getters
-  int         Get_arrival_time(void);
-  std::string Get_aircraft_id(void);
-  Vectors     Get_displacement(void);
-  Vectors     Get_velocity(void);
+  // Getters
+  int         Get_arrival_time(void) const;  // Marked as const
+  std::string Get_aircraft_id(void) const;   // Marked as const
+  Vectors     Get_displacement(void) const;  // Marked as const
+  Vectors     Get_velocity(void) const;     // Marked as const
 
-  //Setters
+  // Setters
   void Set_arrival_time(int arrival_time);
   void Set_aircraft_id(std::string aircraft_id);
   void Set_displacement(Vectors displacement);
   void Set_velocity(Vectors velocity);
 
-  //Thread Specific
+  // Thread Specific
   void Start_thread(void);
   void Join(void);
 
-  //Destructor
+  // Destructor
   ~Aircraft(void);
 
   friend std::ostream& operator<<(std::ostream& cout, const Aircraft& aircraft_ref);
 };
+
 
 #endif
