@@ -67,6 +67,21 @@ Aircraft::~Aircraft(void)
   /*Debug::Log("Aircraft obj destroyed");*/
   pthread_attr_destroy(&(Aircraft::aircraft_thread_attr));
 }
+int Aircraft::Get_arrival_time(void) const {
+    return this->arrival_time;
+}
+
+std::string Aircraft::Get_aircraft_id(void) const {
+    return this->aircraft_id;
+}
+
+Vectors Aircraft::Get_displacement(void) const {
+    return this->displacement;
+}
+
+Vectors Aircraft::Get_velocity(void) const {
+    return this->velocity;
+}
 
 std::ostream& operator<<(std::ostream& cout, const Aircraft& aircraft_ref)
 {
