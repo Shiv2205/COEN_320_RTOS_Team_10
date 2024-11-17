@@ -6,6 +6,8 @@
 #include <CheckforSeparation.h>
 #include <unistd.h> //For sleep()
 
+using namespace std;
+
 int main()
 {
   Aircraft_T::Tuple_Vector  aircraft_data;
@@ -27,6 +29,9 @@ int main()
     aircraft_obj.Join();
   }
 
+thread operatorConsoleThread(OperatorConsole,ref(aircraft_threads));
+thread dataDisplayThread(DataDisplaySystem, ref(aircraft_threads));
+
   // Define a separation threshold for violations (e.g., 5.0 units)
      double separation_threshold = 5.0;
      CheckforSeparation checkForSeparation(separation_threshold);
@@ -43,6 +48,11 @@ int main()
 
      // Check for any separation violations
      checkForSeparation.CheckforViolations();
+
+     //wait till threads finish
+     operatorConsoleThread.join();
+     dataDisplayThread.join();
+
 
   std::cout << "Finished" << std::endl;
   return EXIT_SUCCESS;
