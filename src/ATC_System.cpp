@@ -12,6 +12,12 @@ int main()
   std::vector<Aircraft>     aircraft_threads;
 
   aircraft_data = Parser::Parse();//Parse the file and extract aircraft data
+
+  std::cout << "Parsed " << aircraft_data.size() << " aircraft data." << std::endl;
+
+  if (aircraft_data.empty()) {
+      std::cout << "No aircraft data found." << std::endl;
+  }
   for(auto itr = aircraft_data.begin(); itr != aircraft_data.end(); itr++)
   {
     Aircraft aircraft_obj(*itr);
@@ -19,7 +25,7 @@ int main()
     aircraft_obj.Start_thread();
   }
 
-  //sleep(10);
+  sleep(10);
 
   for(auto itr = aircraft_threads.begin(); itr != aircraft_threads.end(); itr++)
   {
@@ -27,22 +33,24 @@ int main()
     aircraft_obj.Join();
   }
 
-  // Define a separation threshold for violations (e.g., 5.0 units)
+
      double separation_threshold = 5.0;
      CheckforSeparation checkForSeparation(separation_threshold);
 
-     // Create some aircraft
-     Aircraft aircraft1(1, "AC001", Vectors(0, 0, 0), Vectors(1, 1, 1));
-     Aircraft aircraft2(2, "AC002", Vectors(3, 3, 3), Vectors(-1, -1, -1));
-     Aircraft aircraft3(3, "AC003", Vectors(6, 0, 0), Vectors(0, 1, 1));
 
-     // Add aircraft to the separation check system
+     Aircraft aircraft1(1, "AC001", Vectors(0, 0, 0), Vectors(1, 1, 1));
+     Aircraft aircraft2(2, "AC002", Vectors(-1, 1, 0), Vectors(-1, -1, -1));
+     Aircraft aircraft3(3, "AC003", Vectors(20, 20, 20), Vectors(0, 1, 1));
+
+
+     std::cout << "Adding aircraft to the separation system..." << std::endl;
      checkForSeparation.AddAircraft(aircraft1);
      checkForSeparation.AddAircraft(aircraft2);
      checkForSeparation.AddAircraft(aircraft3);
 
      // Check for any separation violations
      checkForSeparation.CheckforViolations();
+
 
   std::cout << "Finished" << std::endl;
   return EXIT_SUCCESS;
