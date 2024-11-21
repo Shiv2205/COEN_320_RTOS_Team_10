@@ -35,7 +35,8 @@ void OperatorConsole(vector<Aircraft>& aircraft_threads) {
         // Iterate through the aircraft threads
         for (auto& aircraft : aircraft_threads) {
             if (aircraft.Get_aircraft_id() == Aircraft_ID) {
-                aircraft.UpdateParameters(X, Y, Z);
+                //TODO: Implement Update_parameters(x, y, z)
+                //aircraft.UpdateParameters(X, Y, Z);
                 logFile << "Time: " << chrono::system_clock::to_time_t(chrono::system_clock::now()) << " | "
                         << "Aircraft ID: " << Aircraft_ID << " | New Position: (" << X << ", " << Y << ", " << Z << ")\n";
                 logFile.flush();

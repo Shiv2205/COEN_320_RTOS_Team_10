@@ -1,23 +1,6 @@
 #ifndef PARSER_H
 #define PARSER_H
 
-/*Defines*/
-#define LOW             0
-#define MEDIUM          1
-#define HIGH            2
-#define OVERLOAD        3
-
-#ifndef TRAFFIC
-  #define TRAFFIC       MEDIUM
-#endif
-
-#ifndef DATA_PATH
-  #define DATA_PATH     "/tmp/shared/data_traffic.txt"
-#endif
-
-#define EMPTY_STR       ""
-
-
 /*Inlcudes*/
 #include <string>
 #include <fstream>
@@ -27,12 +10,31 @@
 #include <Aliases.h>
 
 
+/*Defines*/
+#define EMPTY_STR       ""
+
+
 /*Namespaces*/
+namespace Traffic
+{
+  typedef enum
+  {
+    LOW,
+    MEDIUM,
+    HIGH,
+    OVERLOAD
+  } Level;
+
+  //Getters
+  std::string Get_traffic_data(const Traffic::Level& current_traffic);
+
+}
+
 namespace Parser
 {
   //Main Parse functions
   std::vector<Aircraft_T::Tuple> Parse(void);
-  std::vector<Aircraft_T::Tuple> Parse(std::string file_path);
+  std::vector<Aircraft_T::Tuple> Parse(Traffic::Level current_traffic);
 
   //Create file if it does not exist
   void Handle_missing_file(const std::string& file_path, std::ifstream& reader);
