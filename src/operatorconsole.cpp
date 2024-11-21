@@ -1,3 +1,4 @@
+#include "operatorconsole.h"
 #include <iostream>
 #include <vector>
 #include <fstream>
@@ -7,6 +8,7 @@
 #include <limits>
 #include "Aircraft.h"
 #include "Parser.h"
+
 
 using namespace std;
 
@@ -18,20 +20,13 @@ void OperatorConsole(vector<Aircraft>& aircraft_threads) {
     ofstream logFile("commands.log", ios::app); // Open commands.log in append mode
 
     while (true) {
-        int Aircraft_ID;
+        string Aircraft_ID;
         double X, Y, Z;
 
-        // Prompt the user for input
+        // ask user for input
         cout << "Enter the command in the following order: AircraftID NewX NewY NewZ: ";
         cin >> Aircraft_ID >> X >> Y >> Z;
 
-        // Check if the input is valid
-        if (!(cin >> Aircraft_ID >> X >> Y >> Z)) {
-            cout << "Invalid input. Please enter valid values for AircraftID, X, Y, and Z.\n";
-            cin.clear(); 
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
-            continue;
-        }
 
         // Lock the mutex before accessing shared resources
         lock_guard<mutex> lock(MUTEX);
@@ -39,30 +34,28 @@ void OperatorConsole(vector<Aircraft>& aircraft_threads) {
 
         // Iterate through the aircraft threads
         for (auto& aircraft : aircraft_threads) {
-            if (aircraft.GetID() == Aircraft_ID) {
-                
-                // Update the aircraft's parameters
+            if (aircraft.Get_aircraft_id() == Aircraft_ID) {
                 aircraft.UpdateParameters(X, Y, Z);
-
-                // Log the command to the file
                 logFile << "Time: " << chrono::system_clock::to_time_t(chrono::system_clock::now()) << " | "
                         << "Aircraft ID: " << Aircraft_ID << " | New Position: (" << X << ", " << Y << ", " << Z << ")\n";
-                
+                logFile.flush();
                 cout << "Aircraft " << Aircraft_ID << " updated to position (" << X << ", " << Y << ", " << Z << ").\n";
                 found = true;
                 break;
             }
         }
 
+
         if (!found) {
-            cout << "Aircraft ID " << Aircraft_ID << " not found.\n";
-        }
-    }
-}
+                   cout << "Aircraft ID " << Aircraft_ID << " is not found!!!\n";
+                   break;  // Exit the while loop if the aircraft ID is not found
+               }
+           }
+       }
 
 void DataDisplaySystem(const vector<Aircraft>& aircraft_threads) {
 
-    // Open the data log file in append mode
+    // Open the data log file
     ofstream logFile("aircraft_data.log", ios::app);
 
     while (true) {
@@ -71,15 +64,17 @@ void DataDisplaySystem(const vector<Aircraft>& aircraft_threads) {
 
         // Iterate through each aircraft in the vector
         for (const auto& aircraft : aircraft_threads) {
-            // Log the aircraft's data (ID and position)
-            logFile << "Time: " << chrono::system_clock::to_time_t(chrono::system_clock::now()) << " | "
-                    << "Aircraft ID: " << aircraft.GetID() << " | Position: " << aircraft.GetPosition() << "\n";
-        }
-        
+            logFile << "Aircraft ID: " << aircraft.Get_aircraft_id()
+                    << " | Position: (" << aircraft.Get_displacement().x << ", "
+                    << aircraft.Get_displacement().y << ", "
+                    << aircraft.Get_displacement().z << ")\n";
+
+                   }
+
+
         // Sleep for 5 seconds before the next iteration
         this_thread::sleep_for(chrono::seconds(5));
     }
-    datalogFile.close();
-}
+    this_thread::sleep_for(chrono::seconds(5));}
 
 

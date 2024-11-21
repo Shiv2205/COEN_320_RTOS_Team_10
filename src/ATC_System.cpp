@@ -5,6 +5,8 @@
 #include <Aliases.h>
 #include <CheckforSeparation.h>
 #include <unistd.h> //For sleep()
+#include <thread>
+#include "operatorconsole.h"
 
 using namespace std;
 
@@ -13,24 +15,20 @@ int main()
   Aircraft_T::Tuple_Vector  aircraft_data;
   std::vector<Aircraft>     aircraft_threads;
 
+
   aircraft_data = Parser::Parse();//Parse the file and extract aircraft data
-  for(auto itr = aircraft_data.begin(); itr != aircraft_data.end(); itr++)
-  {
-    Aircraft aircraft_obj(*itr);
-    aircraft_threads.push_back(aircraft_obj);
-    aircraft_obj.Start_thread();
+  for (auto& tuple : aircraft_data) {
+      aircraft_threads.emplace_back(tuple);
+      aircraft_threads.back().Start_thread();
   }
+
 
   //sleep(10);
 
-  for(auto itr = aircraft_threads.begin(); itr != aircraft_threads.end(); itr++)
-  {
-    Aircraft aircraft_obj = *itr;
-    aircraft_obj.Join();
+  for (auto& aircraft : aircraft_threads) {
+      aircraft.Join();  // Join thread on the actual object
   }
 
-thread operatorConsoleThread(OperatorConsole,ref(aircraft_threads));
-thread dataDisplayThread(DataDisplaySystem, ref(aircraft_threads));
 
   // Define a separation threshold for violations (e.g., 5.0 units)
      double separation_threshold = 5.0;
@@ -49,6 +47,12 @@ thread dataDisplayThread(DataDisplaySystem, ref(aircraft_threads));
      // Check for any separation violations
      checkForSeparation.CheckforViolations();
 
+    thread operatorConsoleThread(OperatorConsole,ref(aircraft_threads));
+    thread dataDisplayThread(DataDisplaySystem,ref(aircraft_threads));
+
+    for (auto& aircraft : aircraft_threads) {
+           aircraft.Join();
+       }
      //wait till threads finish
      operatorConsoleThread.join();
      dataDisplayThread.join();
