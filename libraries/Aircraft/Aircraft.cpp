@@ -60,27 +60,42 @@ void Aircraft::Start_thread(void)
 void Aircraft::Join(void)
 {
   pthread_join(this->aircraft_thread, nullptr);
+  pthread_attr_destroy(&(Aircraft::aircraft_thread_attr));
 }
 
 Aircraft::~Aircraft(void)
 {
   /*Debug::Log("Aircraft obj destroyed");*/
-  pthread_attr_destroy(&(Aircraft::aircraft_thread_attr));
+  //pthread_attr_destroy(&(Aircraft::aircraft_thread_attr));
 }
-int Aircraft::Get_arrival_time(void) const {
-    return this->arrival_time;
-}
-
-std::string Aircraft::Get_aircraft_id(void) const {
-    return this->aircraft_id;
+int Aircraft::Get_arrival_time (void) const
+{
+  return this->arrival_time;
 }
 
-Vectors Aircraft::Get_displacement(void) const {
-    return this->displacement;
+std::string Aircraft::Get_aircraft_id (void) const
+{
+  return this->aircraft_id;
 }
 
-Vectors Aircraft::Get_velocity(void) const {
-    return this->velocity;
+Vectors Aircraft::Get_displacement (void) const
+{
+  return this->displacement;
+}
+
+Vectors Aircraft::Get_velocity (void) const
+{
+  return this->velocity;
+}
+
+Flying_Object* Aircraft::PSR_ping_response(void)
+{
+  return this;
+}
+
+Flying_Object* Aircraft::SSR_ping_response(void)
+{
+  return this;
 }
 
 std::ostream& operator<<(std::ostream& cout, const Aircraft& aircraft_ref)

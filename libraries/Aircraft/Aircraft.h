@@ -7,6 +7,7 @@
 #include <pthread.h>
 #include <Vectors.h>
 #include <Aliases.h>
+#include "Flying_Object.h"
 
 
 /*Defines*/
@@ -14,7 +15,7 @@
 
 
 /*Classes*/
-class Aircraft
+class Aircraft: Flying_Object
 {
 private:
   static pthread_attr_t aircraft_thread_attr;
@@ -37,10 +38,10 @@ public:
   Aircraft(Aircraft_T::Tuple& aircraft_tuple);
 
   // Getters
-  int         Get_arrival_time(void) const;  // Marked as const
-  std::string Get_aircraft_id(void) const;   // Marked as const
-  Vectors     Get_displacement(void) const;  // Marked as const
-  Vectors     Get_velocity(void) const;     // Marked as const
+  std::string Get_aircraft_id(void)   const;
+  int         Get_arrival_time(void)  const override;
+  Vectors     Get_displacement(void)  const override;
+  Vectors     Get_velocity(void)      const override;
 
   // Setters
   void Set_arrival_time(int arrival_time);
@@ -52,8 +53,12 @@ public:
   void Start_thread(void);
   void Join(void);
 
+  // Radar functions
+  Flying_Object* PSR_ping_response(void) override;
+  Flying_Object* SSR_ping_response(void) override;
+
   // Destructor
-  ~Aircraft(void);
+  ~Aircraft(void) override;
 
   friend std::ostream& operator<<(std::ostream& cout, const Aircraft& aircraft_ref);
 };
