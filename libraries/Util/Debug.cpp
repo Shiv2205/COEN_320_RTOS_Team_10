@@ -1,7 +1,7 @@
 #include <Debug.h>
 
 template <typename T>
-void Debug::Log(T log_data)
+void Debug::Log(T* log_data)
 {
   std::cout << log_data << std::endl;
 }

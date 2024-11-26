@@ -1,6 +1,17 @@
 #include "Timer.h"
 
-Timer::Timer(void){}
+int Timer::timer_count = 0;
+
+Timer::Timer(void):
+  timer_id            (Timer::timer_count++),
+  timer_specs         {},
+  timer_event_config  {}
+{
+  this->timer_specs.it_value.tv_sec     = 0;
+  this->timer_specs.it_value.tv_nsec    = 0;
+  this->timer_specs.it_interval.tv_sec  = 0;
+  this->timer_specs.it_interval.tv_nsec = 0;
+}
 
 void Timer::Set_timer_event_config(int event_notif_mode, void (*event_handler)(union sigval), void* event_data)
 {
@@ -31,7 +42,10 @@ void Timer::Set_timer_specs(int event_start_sec, int event_interval_sec)
 
 int Timer::Create_timer(void)
 {
-  if(TIMER_FAILURE == timer_create(CLOCK_REALTIME, &this->timer_event_config, &this->timer_id)){
+  if(TIMER_FAILURE == timer_create(CLOCK_REALTIME, &this->timer_event_config, &this->timer_id))
+  {
+    std::cout << "Error creating timer: " << strerror(errno) << std::endl;
+    this->timer_id = 0;
     return TIMER_FAILURE;
   }
   else
@@ -42,7 +56,9 @@ int Timer::Create_timer(void)
 
 int Timer::Start_timer(void)
 {
-  if(TIMER_FAILURE == timer_settime(this->timer_id, 0, &this->timer_specs, nullptr)){
+  if(TIMER_FAILURE == timer_settime(this->timer_id, 0, &this->timer_specs, nullptr))
+  {
+    std::cout << "Error starting timer: " << strerror(errno) << std::endl;
     return TIMER_FAILURE;
   }
   else
@@ -53,16 +69,19 @@ int Timer::Start_timer(void)
 
 int Timer::Delete_timer(void)
 {
-  if(TIMER_FAILURE == timer_delete(this->timer_id)){
+  if(TIMER_FAILURE == timer_delete(this->timer_id))
+  {
+    std::cout << "Error deleting timer: " << strerror(errno) << std::endl;
     return TIMER_FAILURE;
   }
   else
   {
+    this->timer_id = 0;
     return TIMER_OK;
   }
 }
 
 Timer::~Timer(void)
 {
-  this->Delete_timer();
+  //this->Delete_timer();
 }

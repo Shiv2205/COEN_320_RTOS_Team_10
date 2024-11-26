@@ -23,6 +23,10 @@ struct Vectors
   Vectors(int x_val, int y_val, int z_val):
     x(x_val), y(y_val), z(z_val){}
 
+  // Copy constructor
+  Vectors(const Vectors& copy_vector):
+    x(copy_vector.x), y(copy_vector.y), z(copy_vector.z){}
+
   //Display
   friend std::ostream& operator<<(std::ostream& cout, const Vectors& vector_data)
   {

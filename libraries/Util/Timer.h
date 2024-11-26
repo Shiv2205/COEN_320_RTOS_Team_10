@@ -1,6 +1,7 @@
 #ifndef MY_TIMER_H
 #define MY_TIMER_H
 
+#include <iostream>
 #include <time.h>
 #include <sys/siginfo.h>
 
@@ -10,6 +11,8 @@
 class Timer
 {
 private:
+  static int timer_count;
+
   timer_t             timer_id;
   struct itimerspec   timer_specs;
   struct sigevent     timer_event_config;
