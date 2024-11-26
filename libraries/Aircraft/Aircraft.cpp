@@ -38,29 +38,20 @@ void* Aircraft::Thread_routine(void* aircraft_obj_ptr)
 {
   Aircraft* aircraft_ptr = static_cast<Aircraft*>(aircraft_obj_ptr);
 
-  while(Aircraft::current_time <= 20)//!aircraft_ptr->Is_out_of_bound()
-  {
-    if(!aircraft_ptr->Is_update_position())
-    {
-      continue;
-    }
+  aircraft_ptr->arrival_time = Aircraft::current_time;
+  aircraft_ptr->displacement.x += aircraft_ptr->velocity.x;
+  aircraft_ptr->displacement.y += aircraft_ptr->velocity.y;
+  aircraft_ptr->displacement.z += aircraft_ptr->velocity.z;
 
-    aircraft_ptr->displacement.x += aircraft_ptr->velocity.x;
-    aircraft_ptr->displacement.y += aircraft_ptr->velocity.y;
-    aircraft_ptr->displacement.z += aircraft_ptr->velocity.z;
+  //Critical section
+  pthread_mutex_lock(&Aircraft::aircraft_mutex);
+    std::ofstream writer;
+    writer.open("/tmp/shared/debug.txt", std::ofstream::app);
+    //std::cout << *aircraft_ptr << "\n\n" << std::endl;
+    writer << *aircraft_ptr << "\n";
+    writer.close();
+  pthread_mutex_unlock(&Aircraft::aircraft_mutex);
 
-    //Critical section
-    pthread_mutex_lock(&Aircraft::aircraft_mutex);
-      std::ofstream writer;
-      writer.open("/tmp/shared/debug.txt", std::ofstream::app);
-      //std::cout << *aircraft_ptr << "\n\n" << std::endl;
-      writer << *aircraft_ptr << "\n";
-      writer.close();
-
-      std::cout << *aircraft_ptr << "\n";
-      aircraft_ptr->Set_update_position(false);
-    pthread_mutex_unlock(&Aircraft::aircraft_mutex);
-  }
 
   return nullptr;
 }

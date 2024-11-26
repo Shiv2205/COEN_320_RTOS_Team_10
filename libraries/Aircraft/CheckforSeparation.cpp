@@ -15,7 +15,7 @@ CheckforSeparation::CheckforSeparation (double threshold) : separation_threshold
 
 void CheckforSeparation::AddAircraft (const Aircraft &aircraft)
 {
-  aircrafts.push_back (aircraft);
+  aircrafts.push_back(aircraft);
 }
 
 void CheckforSeparation::CheckforViolations () const
