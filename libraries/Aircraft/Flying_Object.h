@@ -5,16 +5,27 @@
 
 class Flying_Object
 {
+private:
+  int     	arrival_time;
+  Vectors 	displacement;
+  Vectors 	velocity;
+
 public:
+  Flying_Object(void);
+  Flying_Object(int arrival_time, Vectors displacement, Vectors velocity);
 
   // Getters
-  virtual int         Get_arrival_time(void)  const = 0;
-  virtual Vectors     Get_displacement(void)  const = 0;
-  virtual Vectors     Get_velocity(void)      const = 0;
+  virtual int               Get_arrival_time(void)  const;
+  virtual const Vectors&    Get_displacement(void)  const;
+  virtual const Vectors&    Get_velocity(void)      const;
 
-  virtual Flying_Object* PSR_ping_response(void) = 0;
-  virtual Flying_Object* SSR_ping_response(void) = 0;
-  virtual                ~Flying_Object()        = default;
+  virtual void Start_thread(void);
+  virtual void Join(void);
+
+  virtual Flying_Object* PSR_ping_response(void);
+  virtual Flying_Object* SSR_ping_response(void);
+
+  virtual                ~Flying_Object(void);
 };
 
 #endif
