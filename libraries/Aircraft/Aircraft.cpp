@@ -25,15 +25,6 @@ void Aircraft::Mutex_destroy(void)
   }
 }
 
-void Aircraft::Timer_handler(union sigval event)
-{
-  Aircraft* aircraft = static_cast<Aircraft*>(event.sival_ptr);
-
-  std::cout << "Aircraft" << std::endl;
-  aircraft->Thread_routine(aircraft);
-
-}
-
 void* Aircraft::Thread_routine(void* aircraft_obj_ptr)
 {
   Aircraft* aircraft_ptr = static_cast<Aircraft*>(aircraft_obj_ptr);
@@ -64,14 +55,10 @@ Aircraft::Aircraft(int arrival_time, std::string aircraft_id, Vectors displaceme
   aircraft_id     (aircraft_id),
   displacement    (displacement),
   velocity        (velocity),
-  aircraft_thread (Aircraft::thread_count++),
   entry_point     (displacement),
-  update_position (false)
+  aircraft_thread (Aircraft::thread_count++)
 {
   Aircraft::Mutex_init();
-  this->aircraft_timer.Set_timer_event_config(Timer_handler, (void*)this);
-  this->aircraft_timer.Set_timer_specs(1, 1);
-  this->aircraft_timer.Create_timer();
 }
 
 Aircraft::Aircraft(Aircraft_T::Tuple& aircraft_tuple):
@@ -82,7 +69,12 @@ Aircraft::Aircraft(Aircraft_T::Tuple& aircraft_tuple):
     std::get<3>(aircraft_tuple)
           ) {}
 
-bool Aircraft::Is_out_of_bound(void)
+void Aircraft::Set_displacement(Vectors displacement)
+{
+  this->displacement = displacement;
+}
+
+bool Aircraft::Is_out_of_bounds(void)
 {
   Vectors distance_travelled;
   distance_travelled.x = this->displacement.x - this->entry_point.x;
@@ -105,11 +97,6 @@ bool Aircraft::Is_out_of_bound(void)
   return false;
 }
 
-void Aircraft::Set_update_position (bool update_position)
-{
-  this->update_position = update_position;
-}
-
 void Aircraft::Start_thread(void)
 {
   //Initialize thread attributes
@@ -126,15 +113,10 @@ void Aircraft::Start_thread(void)
   }
 
   std::cout << "Thread count: " << Aircraft::thread_count << std::endl;
-
-
-  //Start the aircraft's timer
-  //this->aircraft_timer.Start_timer();
 }
 
 void Aircraft::Join(void)
 {
-  this->aircraft_timer.Delete_timer();
   pthread_join(this->aircraft_thread, nullptr);
   pthread_attr_destroy(&(this->aircraft_thread_attr));
 }
@@ -158,12 +140,6 @@ const Vectors& Aircraft::Get_velocity (void) const
 {
   return this->velocity;
 }
-
-bool Aircraft::Is_update_position () const
-{
-  return this->update_position;
-}
-
 
 Flying_Object* Aircraft::PSR_ping_response(void)
 {

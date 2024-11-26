@@ -31,15 +31,12 @@ private:
   std::string     aircraft_id;
   Vectors         displacement;
   Vectors         velocity;
-  bool            update_position;
 
   Vectors         entry_point;
 
   pthread_t       aircraft_thread;
   pthread_attr_t  aircraft_thread_attr;
-  Timer           aircraft_timer;
 
-  static void  Timer_handler(union sigval event);
   static void  Mutex_init(void);
 
 public:
@@ -57,16 +54,14 @@ public:
   int               Get_arrival_time(void)  	const override;
   const Vectors&    Get_displacement(void)  	const override;
   const Vectors&    Get_velocity(void)      	const override;
-  bool              Is_update_position(void)  const;
 
   // Setters
   void Set_arrival_time(int arrival_time);
   void Set_aircraft_id(std::string aircraft_id);
   void Set_displacement(Vectors displacement);
   void Set_velocity(Vectors velocity);
-  void Set_update_position(bool update_position);
 
-  bool Is_out_of_bound(void);
+  bool Is_out_of_bounds(void);
 
   // Thread Specific
   static void* Thread_routine(void* aircraft_obj_ptr);

@@ -32,11 +32,6 @@ int main ()
   aircraft_data = Parser::Parse(Traffic::HIGH); //Parse the file and extract aircraft data
 
   ATC_timer.Start_timer();
-  /*for(auto tuple : aircraft_data)
-  {
-    aircraft_threads.emplace_back(tuple);
-    aircraft_threads.back().Start_thread();
-  }*/
 
   auto tuple_itr = aircraft_data.begin();
   while(aircraft_data.end() != tuple_itr)
@@ -47,35 +42,20 @@ int main ()
       Aircraft& active_aircraft = aircraft_threads.back();
       checkForSeparation.AddAircraft(active_aircraft);
       active_aircraft.Start_thread();
-      std::cout << "Current time: " << Aircraft::current_time
-                    << "Arrival time: " << std::get<0>(*tuple_itr) <<
-          std::endl;
 
       tuple_itr++;
     }
     usleep(25000);
   }
 
-
-
-  //sleep(15);
-
-  // Create some aircraft
-//  Aircraft aircraft1 (1, "AC001", Vectors (0, 0, 0), Vectors (1, 1, 1));
-//  Aircraft aircraft2 (2, "AC002", Vectors (3, 3, 3), Vectors (-1, -1, -1));
-//  Aircraft aircraft3 (3, "AC003", Vectors (6, 0, 0), Vectors (0, 1, 1));
-
-//  // Add aircraft to the separation check system
-//  checkForSeparation.AddAircraft (aircraft1);
-//  checkForSeparation.AddAircraft (aircraft2);
-//  checkForSeparation.AddAircraft (aircraft3);
-
   thread operatorConsoleThread (OperatorConsole, ref (aircraft_threads));
   thread dataDisplayThread (DataDisplaySystem, ref (aircraft_threads));
 
+  while(1);
+
   //wait till threads finish
-  operatorConsoleThread.join ();
-  dataDisplayThread.join ();
+//  operatorConsoleThread.join ();
+//  dataDisplayThread.join ();
 
   for (auto &aircraft : aircraft_threads)
   {
@@ -95,14 +75,29 @@ void Timer_handler(union sigval event)
 
   Aircraft::current_time++;
 
-  if(0 == Aircraft::current_time % 5)
+  if(0 == (Aircraft::current_time % 5))
   {
     // Check for any separation violations
     checkForSeparation.CheckforViolations();
   }
 
-  for(Aircraft& aircraft : *aircraft_threads)
+  if(0 == (Aircraft::current_time % 30))
   {
-    Aircraft::Thread_routine(&aircraft);
+    //log airspace
+  }
+
+  for(auto aircraft_itr = (*aircraft_threads).begin(); aircraft_itr != (*aircraft_threads).end(); aircraft_itr++)
+  {
+    if((*aircraft_itr).Is_out_of_bounds())
+    {
+      std::cout << "Leaving airspace: \n" << *aircraft_itr << std::endl;
+      (*aircraft_itr).Join();
+      (*aircraft_threads).erase(aircraft_itr);
+      std::cout << "Number of aircrafts still in airspace: " << (*aircraft_threads).size() << std::endl;
+    }
+    else
+    {
+      Aircraft::Thread_routine(&(*aircraft_itr));
+    }
   }
 }

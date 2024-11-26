@@ -39,7 +39,7 @@ void OperatorConsole (vector<Aircraft> &aircraft_threads)
       if (aircraft.Get_aircraft_id() == Aircraft_ID)
       {
         //TODO: Implement Update_parameters(x, y, z)
-        //aircraft.UpdateParameters(X, Y, Z);
+        aircraft.Set_displacement(Vectors(X,Y,Z));
         logFile << "Time: "
             << chrono::system_clock::to_time_t(chrono::system_clock::now())
             << " | " << "Aircraft ID: " << Aircraft_ID << " | New Position: ("
@@ -64,7 +64,7 @@ void DataDisplaySystem (const vector<Aircraft> &aircraft_threads)
 {
 
   // Open the data log file
-  ofstream logFile("aircraft_data.log", ios::app);
+  ofstream logFile("/tmp/shared/aircraft_data.log", ios::app);
 
   while (true)
   {
