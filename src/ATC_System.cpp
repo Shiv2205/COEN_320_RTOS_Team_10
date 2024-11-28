@@ -81,6 +81,7 @@ void Timer_handler(union sigval event)
   // Check for any separation violations
   if(0 == (Aircraft::current_time % 5))
   {
+    //checkForSeparation.CheckforViolations();
     checkForSeparation.CheckforViolations();
   }
 
