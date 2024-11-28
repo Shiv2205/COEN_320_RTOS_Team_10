@@ -29,7 +29,6 @@ void* Aircraft::Thread_routine(void* aircraft_obj_ptr)
 {
   Aircraft* aircraft_ptr = static_cast<Aircraft*>(aircraft_obj_ptr);
 
-  aircraft_ptr->arrival_time = Aircraft::current_time;
   aircraft_ptr->displacement.x += aircraft_ptr->velocity.x;
   aircraft_ptr->displacement.y += aircraft_ptr->velocity.y;
   aircraft_ptr->displacement.z += aircraft_ptr->velocity.z;
@@ -38,7 +37,6 @@ void* Aircraft::Thread_routine(void* aircraft_obj_ptr)
   pthread_mutex_lock(&Aircraft::aircraft_mutex);
     std::ofstream writer;
     writer.open("/tmp/shared/debug.txt", std::ofstream::app);
-    //std::cout << *aircraft_ptr << "\n\n" << std::endl;
     writer << *aircraft_ptr << "\n";
     writer.close();
   pthread_mutex_unlock(&Aircraft::aircraft_mutex);
@@ -111,8 +109,6 @@ void Aircraft::Start_thread(void)
     std::cout << "Thread creation failure!" << "/n";
     pthread_attr_destroy(&(Aircraft::aircraft_thread_attr));//Clean up
   }
-
-  std::cout << "Thread count: " << Aircraft::thread_count << std::endl;
 }
 
 void Aircraft::Join(void)

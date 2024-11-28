@@ -48,10 +48,13 @@ int main ()
     usleep(25000);
   }
 
-  thread operatorConsoleThread (OperatorConsole, ref (aircraft_threads));
-  thread dataDisplayThread (DataDisplaySystem, ref (aircraft_threads));
+  while(!aircraft_threads.empty())
+  {
+    thread operatorConsoleThread (OperatorConsole, ref (aircraft_threads));
+    //thread dataDisplayThread (DataDisplaySystem, ref (aircraft_threads));
 
-  while(1);
+    operatorConsoleThread.join();
+  }
 
   //wait till threads finish
 //  operatorConsoleThread.join ();
@@ -75,29 +78,34 @@ void Timer_handler(union sigval event)
 
   Aircraft::current_time++;
 
+  // Check for any separation violations
   if(0 == (Aircraft::current_time % 5))
   {
-    // Check for any separation violations
     checkForSeparation.CheckforViolations();
   }
 
-  if(0 == (Aircraft::current_time % 30))
-  {
-    //log airspace
-  }
-
+  //Remove aircrafts that are out of bounds
   for(auto aircraft_itr = (*aircraft_threads).begin(); aircraft_itr != (*aircraft_threads).end(); aircraft_itr++)
   {
     if((*aircraft_itr).Is_out_of_bounds())
     {
       std::cout << "Leaving airspace: \n" << *aircraft_itr << std::endl;
-      (*aircraft_itr).Join();
-      (*aircraft_threads).erase(aircraft_itr);
-      std::cout << "Number of aircrafts still in airspace: " << (*aircraft_threads).size() << std::endl;
+      aircraft_itr->Join();
+      aircraft_threads->erase(aircraft_itr);
+      std::cout << "Number of aircrafts still in airspace: " << aircraft_threads->size() << std::endl;
     }
     else
     {
       Aircraft::Thread_routine(&(*aircraft_itr));
     }
   }
+
+  //log airspace
+  if(0 == (Aircraft::current_time % 30))
+    {
+      std::cout << "Logging airspace" << std::endl;
+      Airspace current_airspace(aircraft_threads);
+
+      Airspace::Thread_routine(&current_airspace);
+    }
 }
